@@ -1,2 +1,5 @@
+# Ignore virtual environment folders and CSV files
 .venv/
 .single-chip/
+.three-chip/
+*.csv
