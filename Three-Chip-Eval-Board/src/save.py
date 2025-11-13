@@ -25,37 +25,37 @@ scope = rm.open_resource(VISA_ADDRESS)
 # Optional: identify instrument
 print("Connected to:", scope.query("*IDN?"))
 
-# scope.write(":WAVeform:SOURCE POD1")
-# scope.write(":WAVeform:FORMat ASCii")
-# scope.write(f":WAVeform:POINts {POINTS}")
+scope.write(":WAVeform:SOURCE POD1")
+scope.write(":WAVeform:FORMat ASCii")
+scope.write(f":WAVeform:POINts {POINTS}")
 
-# '''Everything Below Here'''
-# # Get preamble for timing
-# preamble = scope.query(":WAVeform:PREamble?").split(',')
-# xinc = float(preamble[4])
-# xorig = float(preamble[5])
-# print("Time increment:", xinc, "Start:", xorig)
+'''Everything Below Here'''
+# Get preamble for timing
+preamble = scope.query(":WAVeform:PREamble?").split(',')
+xinc = float(preamble[4])
+xorig = float(preamble[5])
+print("Time increment:", xinc, "Start:", xorig)
 
-# # Query waveform data
-# raw = scope.query(":WAVeform:DATA?")
-# # print(raw)
-# # --- Clean block header ---
-# # Remove header like "#800003999"
-# data_str = re.sub(r"^#\d+\d+", "", raw).strip()
+# Query waveform data
+raw = scope.query(":WAVeform:DATA?")
+# print(raw)
+# --- Clean block header ---
+# Remove header like "#800003999"
+data_str = re.sub(r"^#\d+\d+", "", raw).strip()
 
-# # Split into individual samples (remove any stray spaces)
-# samples = [int(s) for s in re.split(r"[, ]+", data_str) if s.strip().isdigit()]
+# Split into individual samples (remove any stray spaces)
+samples = [int(s) for s in re.split(r"[, ]+", data_str) if s.strip().isdigit()]
 
-# # Compute time array
-# times = [xorig + i * xinc for i in range(len(samples))]
+# Compute time array
+times = [xorig + i * xinc for i in range(len(samples))]
 
-# # --- Write to CSV ---
-# out_filename = f"{SAVE_PATH}/scope_D0-D7.csv"
-# with open(out_filename, "w", newline="") as f:
-#     writer = csv.writer(f)
-#     writer.writerow(["x-axis", "D0-D7"])
-#     writer.writerow(["second", ""])  # same header style as your reference
-#     for t, val in zip(times, samples):
-#         writer.writerow([f"{t:.6e}", val])
+# --- Write to CSV ---
+out_filename = f"{SAVE_PATH}/scope_D0-D7.csv"
+with open(out_filename, "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow(["x-axis", "D0-D7"])
+    writer.writerow(["second", ""])  # same header style as your reference
+    for t, val in zip(times, samples):
+        writer.writerow([f"{t:.6e}", val])
 
-# print(f"✅ Saved {out_filename} with {len(samples)} samples.")
+print(f"✅ Saved {out_filename} with {len(samples)} samples.")

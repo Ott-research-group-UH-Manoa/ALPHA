@@ -36,7 +36,7 @@ Activate virtual environment
 
 Download python packages to `three-chip` virtual environment 
 
-`pip install -r Three-Chip-Eval-Board/single-chip_requirements.txt`
+`pip install -r Three-Chip-Eval-Board\requirements.txt`
 
 Make sure to source the `three-chip` virtual environment before running code
 
