@@ -16,15 +16,35 @@
 # tried pip installing ivi but that fails with ERROR: Command errored out with exit status 1
 # so we rely on a usb stick and saving the D0-D7 data as "ASCII XY" with length=62500
 
-NUMBER_OF_CHANNELS = 16
-MAX_NUMBER_OF_SAMPLES_PER_WAVEFORM = 256
-EXPECTED_DECIMATION_FACTOR = 3
-NUMBER_OF_LINES_TO_PRINT = (NUMBER_OF_CHANNELS+9)*4*EXPECTED_DECIMATION_FACTOR
-
+import numpy as np
 import sys
 import os
 import csv
 import matplotlib.pyplot as plt
+
+NUMBER_OF_CHANNELS = 16
+MAX_NUMBER_OF_SAMPLES_PER_WAVEFORM = 256
+EXPECTED_DECIMATION_FACTOR = 3  # default
+NUMBER_OF_LINES_TO_PRINT = (NUMBER_OF_CHANNELS+9)*4*EXPECTED_DECIMATION_FACTOR
+TIME_SCALE = None
+RECORD_LEN = None
+
+# Read command-line arguments
+if len(sys.argv) > 2:
+    try:
+        EXPECTED_DECIMATION_FACTOR = int(sys.argv[2])
+    except ValueError:
+        print("Invalid decimation factor, using default 3")
+if len(sys.argv) > 3:
+    try:
+        TIME_SCALE = float(sys.argv[3])
+    except ValueError:
+        print("Invalid time scale")
+if len(sys.argv) > 4:
+    try:
+        RECORD_LEN = int(sys.argv[4])
+    except ValueError:
+        print("Invalid record length")
 
 csv_filename = None
 if len(sys.argv)>1:
@@ -163,15 +183,60 @@ for channel in range(NUMBER_OF_CHANNELS):
 		print(data_point, end=",")
 	print()
 
+# Create a dictionary to map Plot Line (channel index) to ALPHA Pin #
+plot_line_to_alpha_pin = {
+    16: 1,
+    8: 2,
+    4: 3,
+    12: 4,
+    2: 5,
+    10: 6,
+    6: 7,
+    14: 8,
+    1: 9,
+    9: 10,
+    5: 11,
+    13: 12,
+    3: 13,
+    11: 14,
+    7: 15,
+    15: 16
+}
+
+
 SST_FREQUENCY_HZ = 100e6
 #SST_FREQUENCY = 250e6
-import numpy as np
+
 t = np.arange(0.0, actual_data_series_length/SST_FREQUENCY_HZ, 1/SST_FREQUENCY_HZ)
 s = [ np.array(data_series[i], dtype='float32') for i in range(NUMBER_OF_CHANNELS) ]
 fig, ax = plt.subplots()
+
 for i in range(NUMBER_OF_CHANNELS):
-	ax.plot(t, s[i])
-ax.set(xlabel='time (s)', ylabel='ADC value', title='')
+	#ax.plot(t, s[i])
+    alpha_pin = plot_line_to_alpha_pin.get(i + 1, f"Channel {i}")  # +1 if index is 0-based
+    ax.plot(t, s[i], label=f'Pin {alpha_pin}') 
+
+# Add legend with proper positioning
+ax.legend(title='ALPHA Pins', bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8, title_fontsize=9)
+plt.subplots_adjust(right=0.85)  # Reserve 15% space on the right for legend
+
+# Label
+ax.set(xlabel='time (s)', ylabel='ADC value', title=os.path.basename(csv_filename))
+
+# Add header metadata as text inside plot (bottom-right corner)
+meta_text = (
+    f"Time window/div: {TIME_SCALE} s\n"
+    f"Samples: {RECORD_LEN}\n"
+    f"Decimation factor: {EXPECTED_DECIMATION_FACTOR}"
+)
+ax.text(
+    0.98, 0.02, meta_text,
+    transform=ax.transAxes,
+    fontsize=8,
+    va='bottom',
+    ha='right',
+    bbox=dict(facecolor='white', alpha=0.8, edgecolor='gray')
+)
+
 ax.grid()
 plt.show()
-

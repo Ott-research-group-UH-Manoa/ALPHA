@@ -18,7 +18,11 @@ RECORD_LEN = 50000      # number of points to capture
 
 ### Function Generator settings ###
 AMPLITUDE_V  = 0.25      # Amplitude of the function generator signal
-FREQUENCY_HZ = 1e6  # Frequency of the function generator signal
+FREQUENCY_HZ = 20e6  # Frequency of the function generator signal
+###################################
+
+####### Plotting settings #########
+EXPECTED_DECIMATION_FACTOR = 3
 ###################################
 
 # Add sub folder as nesscary 
@@ -44,6 +48,7 @@ def format_time(value):
         return f"{value * 1e6:.0f}us"
     else:
         return f"{value * 1e9:.0f}ns"
+    
 def generate_readable_filename(time_scale, time_delay, record_len, amplitude, frequency):
     # ---- Date Tag (YYYY-MM-DD) ----
     date_str = datetime.date.today().strftime("%Y-%m-%d")
@@ -83,6 +88,19 @@ def generate_readable_filename(time_scale, time_delay, record_len, amplitude, fr
 
     return filename
 
+def ensure_unique_filename(directory, base_filename):
+    """
+    If a file already exists, append _1, _2, ... until unique.
+    """
+    name, ext = os.path.splitext(base_filename)
+    candidate = base_filename
+    counter = 1
+
+    while os.path.exists(os.path.join(directory, candidate)):
+        candidate = f"{name}_{counter}{ext}"
+        counter += 1
+
+    return os.path.join(directory, candidate)
 
 def main():
     if not os.path.exists(SAVE_PATH):
@@ -182,11 +200,11 @@ def main():
 
     # --- Write to CSV ---
     filename = generate_readable_filename(TIME_SCALE, TIME_DELAY, RECORD_LEN, AMPLITUDE_V, FREQUENCY_HZ)
-    out_filename = f"{SAVE_PATH}/{filename}"
+    out_filename = ensure_unique_filename(SAVE_PATH, filename)
     with open(out_filename, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["x-axis", "D0-D7"])
-        writer.writerow(["second", ""])  # same header style as your reference
+        writer.writerow(["second", ""])  
         for t, val in zip(times, samples):
             writer.writerow([f"{t:.6e}", val])
 
@@ -195,15 +213,23 @@ def main():
     function_generator.write(":OUTPut off")
     print("Function Generator Output off")
 
-
-    # --- Call plotting script ---
+    # ================= CALL plot_alpha_data.py =================
+    # Make sure the script is in the same folder
     plot_script = "Three-Chip-Eval-Board/src/plot_alpha_data.py"
 
     try:
-        subprocess.run(["python3", plot_script, out_filename], check=True)
-        print(f"✅ Successfully ran {plot_script} with {out_filename}")
+        # Pass both CSV filename and decimation factor as arguments
+        subprocess.run([
+            "python3", plot_script, 
+            out_filename, 
+            str(EXPECTED_DECIMATION_FACTOR), 
+            str(TIME_SCALE), 
+            str(RECORD_LEN)
+        ], check=True)
+        
+        print(f":white_check_mark: Successfully ran {plot_script} with {out_filename} and decimation factor {EXPECTED_DECIMATION_FACTOR}")
     except subprocess.CalledProcessError as e:
-        print(f"❌ Failed to run {plot_script}: {e}")
+        print(f":x: Failed to run {plot_script}: {e}")
 
 if __name__ == "__main__":
     main()
