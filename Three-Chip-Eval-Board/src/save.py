@@ -9,24 +9,25 @@ import datetime
 ######################## Adjustable Settings ###############################
 
 ########## Scope settings #########
-TIME_SCALE = 50e-6      # seconds per division
+TIME_SCALE = 20e-6      # seconds per division
 TIME_DELAY = 0e-6       # horizontal offset
 # Number of points to acquire
 # (I believe is the same as the length parameter on the scope)
-RECORD_LEN = 50000      # number of points to capture
+RECORD_LEN = 10000      # number of points to capture
 ###################################
 
 ### Function Generator settings ###
 AMPLITUDE_V  = 0.25      # Amplitude of the function generator signal
-FREQUENCY_HZ = 20e6  # Frequency of the function generator signal
+FREQUENCY_HZ = 5e6  # Frequency of the function generator signal
+PED = False
 ###################################
 
 ####### Plotting settings #########
-EXPECTED_DECIMATION_FACTOR = 3
+EXPECTED_DECIMATION_FACTOR = 2
 ###################################
 
 # Add sub folder as nesscary 
-SAVE_PATH = "Three-Chip-Eval-Board/Data"
+SAVE_PATH = "Three-Chip-Eval-Board/Data/1MHz_100us_125Ksa/Pedestal/"  # Directory to save CSV files
 #############################################################################
 
 ############################# Constants ####################################
@@ -36,7 +37,7 @@ MAX_VOLTAGE_V = 0.5    # Maximum voltage expected from the scope input
 ####### Instrument Addresses #######
 SCOPE_ADDRESS = "USB0::0x0957::0x1796::MY53280216::INSTR"
 FUNCTION_GENERATOR_ADDRESS = "USB0::0x0957::0x0407::MY44013842::INSTR"
-#############################################################################
+############################################################################
 
 # ---- Helper to format times ----
 def format_time(value):
@@ -149,6 +150,9 @@ def main():
         print(f"Function generator output turned ON with amplitude {amplitude} V.")
 
     print(f"Function generator configured: Amplitude = {amplitude} V, Frequency = {frequency:.3e} Hz")
+
+    if PED:
+        function_generator.write(":OUTPut off")
     #####################################################################################################
 
     scope.write(":WAVeform:SOURCE POD1")
