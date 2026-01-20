@@ -27,7 +27,7 @@ EXPECTED_DECIMATION_FACTOR = 2
 ###################################
 
 # Add sub folder as nesscary 
-SAVE_PATH = "Three-Chip-Eval-Board/Data/1MHz_100us_125Ksa/Pedestal/"  # Directory to save CSV files
+SAVE_PATH = "Three-Chip-Eval-Board/Data/"  # Directory to save CSV files
 #############################################################################
 
 ############################# Constants ####################################
@@ -78,14 +78,22 @@ def generate_readable_filename(time_scale, time_delay, record_len, amplitude, fr
     amp_str = f"{amplitude}V"
 
     # ---- Build final filename ----
-    filename = (
+    if PED: 
+            filename = (
         f"{date_str}_"
         f"TS_{time_scale_str}_"
         f"TD_{time_delay_str}_"
-        f"RL_{len_str}_"
-        f"A_{amp_str}_"
-        f"F_{freq_str}.csv"
+        f"RL_{len_str}_PED.csv"
     )
+    else:
+        filename = (
+            f"{date_str}_"
+            f"TS_{time_scale_str}_"
+            f"TD_{time_delay_str}_"
+            f"RL_{len_str}_"
+            f"A_{amp_str}_"
+            f"F_{freq_str}.csv"
+        )
 
     return filename
 
@@ -216,6 +224,12 @@ def main():
 
     function_generator.write(":OUTPut off")
     print("Function Generator Output off")
+
+    # Let go of devices
+    print("Releasing instruments...")
+    scope.close()
+    function_generator.close()
+    rm.close()
 
     # ================= CALL plot_alpha_data.py =================
     # Make sure the script is in the same folder
