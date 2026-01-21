@@ -240,4 +240,14 @@ ax.text(
 )
 
 ax.grid()
+out_dir = os.path.join(os.path.dirname(csv_filename), "plots")
+os.makedirs(out_dir, exist_ok=True)
+
+output_image = os.path.join(
+    out_dir,
+    os.path.splitext(os.path.basename(csv_filename))[0] + ".png"
+)
+
+plt.savefig(output_image, dpi=300, bbox_inches="tight")
+
 plt.show()
