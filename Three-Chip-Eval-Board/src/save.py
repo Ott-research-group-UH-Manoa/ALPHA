@@ -19,7 +19,7 @@ RECORD_LEN = 10000      # number of points to capture
 ### Function Generator settings ###
 AMPLITUDE_V  = 0.25      # Amplitude of the function generator signal
 FREQUENCY_HZ = 5e6  # Frequency of the function generator signal
-PED = False
+PED = True
 ###################################
 
 ####### Plotting settings #########

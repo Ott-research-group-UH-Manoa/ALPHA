@@ -215,7 +215,7 @@ cmap = plt.cm.get_cmap("gist_rainbow")
 for i in range(NUMBER_OF_CHANNELS):
 	#ax.plot(t, s[i])
     alpha_pin = plot_line_to_alpha_pin.get(i + 1, f"Channel {i}")  # +1 if index is 0-based
-    ax.plot(t, s[i], label=f'Pin {alpha_pin}', color=cmap(i/NUMBER_OF_CHANNELS)) 
+    ax.plot(t, s[i], label=f'Pin {alpha_pin}', marker='o', color=cmap(i/NUMBER_OF_CHANNELS)) 
 
 # Add legend with proper positioning
 ax.legend(title='ALPHA Pins', bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=8, title_fontsize=9)
