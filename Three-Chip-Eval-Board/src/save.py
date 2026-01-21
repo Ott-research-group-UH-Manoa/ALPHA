@@ -175,9 +175,12 @@ def main():
     print(f"Time delay set to {format_time(TIME_DELAY)}")
     print(f"Record length set to {RECORD_LEN}")
 
-    print("Actual time scale:", scope.query(":TIMebase:SCALe?"))
-    print("Actual time delay:", scope.query(":TIMebase:POSition?"))
-    print("Actual record length:", scope.query(":WAVeform:POINts?"))
+    actual_time_scale = float(scope.query(":TIMebase:SCALe?"))
+    actual_time_delay = float(scope.query(":TIMebase:POSition?"))
+    actual_record_len = int(scope.query(":WAVeform:POINts?"))
+    print(f"Actual time scale: {actual_time_scale}")
+    print(f"Actual time delay: {actual_time_delay}")
+    print(f"Actual record length: {actual_record_len}")
 
     # Trigger 
     print("Arming single trigger — waiting for event...")
@@ -241,8 +244,8 @@ def main():
             "python3", plot_script, 
             out_filename, 
             str(EXPECTED_DECIMATION_FACTOR), 
-            str(TIME_SCALE), 
-            str(RECORD_LEN)
+            str(actual_time_scale), 
+            str(actual_record_len)
         ], check=True)
         
         print(f":white_check_mark: Successfully ran {plot_script} with {out_filename} and decimation factor {EXPECTED_DECIMATION_FACTOR}")
