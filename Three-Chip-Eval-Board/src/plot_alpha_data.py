@@ -209,7 +209,7 @@ SST_FREQUENCY_HZ = 100e6
 
 t = np.arange(0.0, actual_data_series_length/SST_FREQUENCY_HZ, 1/SST_FREQUENCY_HZ)
 s = [ np.array(data_series[i], dtype='float32') for i in range(NUMBER_OF_CHANNELS) ]
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(16,10))
 cmap = plt.cm.get_cmap("gist_rainbow")
 
 for i in range(NUMBER_OF_CHANNELS):
@@ -248,6 +248,6 @@ output_image = os.path.join(
     os.path.splitext(os.path.basename(csv_filename))[0] + ".png"
 )
 
-plt.savefig(output_image, dpi=300, bbox_inches="tight")
+plt.savefig(output_image, dpi=600, bbox_inches="tight")
 
 plt.show()
