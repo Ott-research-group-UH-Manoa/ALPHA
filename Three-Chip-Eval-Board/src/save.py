@@ -13,13 +13,14 @@ TIME_SCALE = 20e-6      # seconds per division
 TIME_DELAY = 0e-6       # horizontal offset
 # Number of points to acquire
 # (I believe is the same as the length parameter on the scope)
-RECORD_LEN = 10000      # number of points to capture
+RECORD_LEN = 10_000      # number of points to capture
 ###################################
 
 ### Function Generator settings ###
+SIGNAL_TYPE = "PULSE"  # "SIN" or "PULSE"
 AMPLITUDE_V  = 0.25      # Amplitude of the function generator signal
 FREQUENCY_HZ = 5e6  # Frequency of the function generator signal
-PED = True
+PED = False
 ###################################
 
 ####### Plotting settings #########
@@ -27,7 +28,7 @@ EXPECTED_DECIMATION_FACTOR = 2
 ###################################
 
 # Add sub folder as nesscary 
-SAVE_PATH = "Three-Chip-Eval-Board/Data/"  # Directory to save CSV files
+SAVE_PATH = "Three-Chip-Eval-Board/Data/PULSE_5MHz_250mVpp_50ns_Width_20us_10KSa"  # Directory to save CSV files
 #############################################################################
 
 ############################# Constants ####################################
@@ -136,7 +137,11 @@ def main():
     # Make sure output is off before configuring 
     function_generator.write(":OUTPut off")
 
-    function_generator.write("FUNCtion SIN")
+    if SIGNAL_TYPE.upper() == "SIN":
+        function_generator.write("FUNCtion SIN")
+    elif SIGNAL_TYPE.upper() == "PULSE":
+        function_generator.write("FUNCtion PULSE")
+
     function_generator.write(":VOLTage:UNIT VPP")
     function_generator.write(f"FREQuency {FREQUENCY_HZ}")
 
